@@ -187,3 +187,7 @@ python tools/backtest_table.py                     # held-out table -> model/bac
 ## Prior work disclosure
 
 `legacy/` holds code written before the hackathon (April 2026): a pump.fun collector, a dev-history scanner and a Google-Sheets scorer for finding *good* devs. Everything else was built during Colosseum Crypto World's Fair (from 14.09.2026): the live scorer, the Mirage transport, the pump.fun event decoder, the Dune census and training pipeline, the model, the tests and the tools.
+
+## License
+
+Licensed under the [PolyForm Noncommercial License 1.0.0](LICENSE). Free for personal, research, academic, and evaluation use. Commercial exploitation, reselling, or hosting as a commercial service is strictly prohibited without explicit written permission.
