@@ -2,6 +2,8 @@
 
 # ClusterPulse
 
+[![tests](https://github.com/Pahan4ek/clusterpulse/actions/workflows/tests.yml/badge.svg)](https://github.com/Pahan4ek/clusterpulse/actions/workflows/tests.yml)
+
 **A 10-second trap-risk score for every pump.fun launch, streamed live from Solana through Solami Mirage.**
 
 About 43,000 tokens launch on pump.fun every day (Dune, 19.09–08.10.2026). Most rugs give themselves away in the first block: a bundle that grabs a third of the supply, a dev who shipped twelve tokens this month. Terminals already show bundle % and dev history as raw numbers. Nobody can read those numbers for 43k launches a day, and none of them answers the question a trader actually has: *how likely am I to get wrecked if I buy this?*
@@ -115,7 +117,7 @@ Mirage is the default source whenever `SOLAMI_API_KEY` is set. If the internet d
 
 Measured on mainnet (`tools/solami_check.py`, 40 s, 10.10.2026): 2,540 pump.fun transactions (about 63 per second) carried 1,932 events, including 20 launches. The first frame arrived 0.4 s after connecting, and the median lag from block time to decoded event was 1.8 s. Block time only has whole-second resolution, so this number is rough.
 
-`tests/test_mirage.py` replays a recorded mainnet stream through both paths. 6,712 transactions decode to identical events, and the full scorer produces identical scores.
+`tests/test_mirage.py` replays a recorded mainnet stream through both paths. 6,712 transactions decode to identical events, and the full scorer produces identical scores. The recording (`raw_sample.jsonl`) stays local; without it the test runs only its synthetic part.
 
 ## Quick start
 
@@ -140,13 +142,17 @@ python live_scorer.py         # live: Mirage if SOLAMI_API_KEY is set, else logs
 
 **Dev history.** `python -m live.devdb --seed` builds `devdb.sqlite` from Dune census exports (`retro/census_run.py`), and `--append` closes gaps (`retro/devgap.sql`). Without it the scorer still runs, but the dev-history features stay empty until it has watched launches for a while.
 
-**Running 24/7.** On Windows, `4_SCORER_24x7.bat` restarts the scorer on exit and writes daily logs. On Linux, use `deploy/clusterpulse-scorer.service` (systemd, `Restart=always`).
+**Exchange labels.** The funding check skips exchange wallets using `dune_out/cex_solana.csv.gz`, a Dune export that isn't in the repo. Without it, only the 1,000+ transactions a day rule marks a funder as a hub.
+
+**Running 24/7.** On Windows, `scripts\scorer_24x7.bat` restarts the scorer on exit and writes daily logs. On Linux, use `deploy/clusterpulse-scorer.service` (systemd, `Restart=always`).
 
 **Offline.**
 
 ```bash
 python tests/test_live.py                       # synthetic events → decoder → features → score
 python tests/test_mirage.py                     # Mirage decoder vs logs on a recorded stream
+python tests/test_funding.py                    # funding check on a fake RPC
+python tests/test_funding_check.py              # funding report end to end, fake RPC
 python live_scorer.py --record raw.jsonl        # record raw messages (frames in Mirage mode)
 python live_scorer.py --replay raw.jsonl        # replay without network, into replay/live.db
 python live_report.py                           # live levels vs outcomes from live.db
@@ -155,6 +161,7 @@ python live_report.py                           # live levels vs outcomes from l
 ## Retraining
 
 ```bash
+pip install -r requirements-retro.txt              # pandas, numpy, scikit-learn
 python retro/census_run.py 2026-08-19 2026-09-18   # Dune census, one CSV per day (needs DUNE_API_KEY)
 python retro/train_live.py                         # weekly AUC, holdout, thresholds -> model/live_model_new.json
 python tools/backtest_table.py                     # held-out table -> model/backtest.md
@@ -171,7 +178,8 @@ python tools/backtest_table.py                     # held-out table -> model/bac
 | `retro/` | Dune SQL and the training pipeline |
 | `model/` | Production model, held-out backtest, fork-A analysis |
 | `tools/` | Solami smoke test, funding check for one launch, backtest table |
-| `tests/` | Offline tests |
+| `tests/` | Offline tests, run on every push by GitHub Actions |
+| `scripts/` | Windows launchers: live scorer, 24/7 restart loop, Solami check, funding check |
 | `legacy/` | Pre-hackathon code (see below) |
 | `docs/archive/` | Early concept documents. Their latency and architecture claims are outdated |
 
