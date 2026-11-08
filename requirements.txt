@@ -1,9 +1,4 @@
-requests==2.31.0
-gspread==6.1.2
-google-auth==2.29.0
+# live scorer and tools/
+requests>=2.32
 websockets>=12.0
 python-dotenv>=1.0.0
-# retro/ (обучение и ретро-анализ)
-pandas
-numpy
-scikit-learn

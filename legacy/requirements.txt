@@ -1,0 +1,4 @@
+# legacy/ pre-hackathon scanner (Google Sheets export)
+-r ../requirements.txt
+gspread==6.1.2
+google-auth==2.29.0
