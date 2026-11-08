@@ -45,7 +45,8 @@ class FakeRPC:
 
 
 buyers = {w: (f"buy-{w}", 1.0) for w in "ABCEHIJKLMN"}
-r = funding.analyse(FakeRPC(), "D", buyers, dev_before_sig="create")
+# exchange labels passed in, so the test does not depend on the local Dune export (dune_out/ is not in the repo)
+r = funding.analyse(FakeRPC(), "D", buyers, dev_before_sig="create", cex={BIN: "Binance 1"})
 assert r["dev_info"]["funder"] == "F0", r["dev_info"]
 assert r["cluster"] == set("ABCE"), r["cluster"]
 assert [g["funder"] for g in r["groups"]] == ["G"] and r["groups"][0]["wallets"] == ["H", "I", "J"], r["groups"]
