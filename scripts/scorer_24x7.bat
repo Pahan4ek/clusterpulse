@@ -1,6 +1,6 @@
 @echo off
 chcp 65001 >nul
-cd /d "%~dp0"
+cd /d "%~dp0.."
 rem Скорер 24/7 на ПК: перезапуск после падения, лог по дням в logs\.
 rem Сон отключить один раз (от админа): powercfg /change standby-timeout-ac 0
 if not exist logs mkdir logs

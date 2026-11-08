@@ -1,6 +1,6 @@
 @echo off
 chcp 65001 >nul
-cd /d "%~dp0"
+cd /d "%~dp0.."
 if not exist devdb.sqlite (
   echo [..] первый запуск: засеваю историю девов из dune_out
   python -m live.devdb --seed

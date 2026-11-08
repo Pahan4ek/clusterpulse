@@ -1,0 +1,5 @@
+# retro/: Dune census, training and analysis
+-r requirements.txt
+pandas
+numpy
+scikit-learn
